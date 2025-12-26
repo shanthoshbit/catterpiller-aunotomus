@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sand Rover Control</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h2>Sand Rover – Automatic Control</h2>
+
+  <button id="autoBtn">START AUTO MODE</button>
+  <button id="manualBtn">MANUAL MODE</button>
+<button onclick="logout()">Logout</button>
+
+  <p>Status: <span id="status">---</span></p>
+  
+  <img id="rover-image" src="https://png.pngtree.com/png-vector/20230803/ourmid/pngtree-mars-rover-vector-png-image_6889496.png" alt="Sand Rover">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+  <script src="app.js"></script>
+</body>
+</html>

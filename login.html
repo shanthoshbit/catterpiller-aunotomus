@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login - Sand Rover Control</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background: url('https://i.pinimg.com/736x/d2/aa/87/d2aa87ced1d4706a758c661b7fff1ca3.jpg') no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+    }
+
+    .login-container {
+      max-width: 400px;
+      width: 90%;
+      padding: 40px;
+      background: rgba(26, 26, 46, 0.85);
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(76, 175, 80, 0.2);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 15px;
+      margin: 8px 0;
+      border: 1px solid #4CAF50;
+      border-radius: 5px;
+      background: rgba(0, 0, 0, 0.3);
+      color: #fff;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    input[type="email"]:focus,
+    input[type="password"]:focus {
+      outline: none;
+      border-color: #4CAF50;
+      box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+    }
+    
+    p {
+      color: #e0e0e0;
+      text-align: center;
+      margin: 0 0 30px 0;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+    
+    h2 {
+      color: #4CAF50;
+      margin: 0 0 25px 0;
+      text-align: center;
+      font-size: 28px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .btn-login {
+      width: 100%;
+      padding: 12px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    
+    .btn-login:hover {
+      background-color: #45a049;
+    }
+    
+    .btn-login:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Sand Rover Control</h2>
+    <p>Please sign in to continue</p>
+    
+    <div class="form-group">
+      <input type="email" id="email" placeholder="Email" required>
+    </div>
+    
+    <div class="form-group">
+      <input type="password" id="password" placeholder="Password" required>
+    </div>
+    
+    <button id="loginBtn" class="btn-login" onclick="login()">Login</button>
+    <p id="msg"></p>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="login.js"></script>
+</body>
+</html>
