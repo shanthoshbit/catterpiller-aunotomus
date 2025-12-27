@@ -1,3 +1,56 @@
+// Notification system
+function showToast(message, type = 'info', duration = 5000) {
+  // Check if browser notifications are supported and permission is granted
+  if (type === 'info' && Notification.permission === 'granted') {
+    new Notification('Sand Rover Update', {
+      body: message,
+      icon: 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png'
+    });
+  }
+
+  // Create toast element
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  
+  // Add message
+  const messageEl = document.createElement('div');
+  messageEl.className = 'toast-message';
+  messageEl.textContent = message;
+  toast.appendChild(messageEl);
+  
+  // Add close button
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'toast-close';
+  closeBtn.innerHTML = '&times;';
+  closeBtn.onclick = () => toast.remove();
+  toast.appendChild(closeBtn);
+  
+  // Add to container
+  const container = document.getElementById('toastContainer');
+  if (container) {
+    container.appendChild(toast);
+    
+    // Auto remove after duration
+    setTimeout(() => {
+      toast.style.transform = 'translateX(120%)';
+      setTimeout(() => toast.remove(), 300);
+    }, duration);
+  }
+  
+  return toast;
+}
+
+// Request notification permission when the page loads
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    if (Notification.permission !== 'denied') {
+      Notification.requestPermission();
+    }
+  });
+} else if (Notification.permission !== 'denied') {
+  Notification.requestPermission();
+}
+
 // Auto-logout configuration
 const INACTIVITY_TIMEOUT = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
 let logoutTimer;
