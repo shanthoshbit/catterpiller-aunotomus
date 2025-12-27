@@ -57,7 +57,7 @@ button:active {
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   transition: transform 0.3s ease;
-  background-color: #e6e6e6 rgba(0, 0, 0, 0.2);
+  background-color: #e6e6e6;
 }
 
 #rover-image:hover {
