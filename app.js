@@ -1,11 +1,20 @@
 // Notification system
 function showToast(message, type = 'info', duration = 5000) {
-  // Check if browser notifications are supported and permission is granted
-  if (type === 'info' && Notification.permission === 'granted') {
-    new Notification('Sand Rover Update', {
-      body: message,
-      icon: 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png'
-    });
+  // Only try to show desktop notification if we're in a secure context
+  const canShowNotification = window.isSecureContext && 
+                            'Notification' in window && 
+                            Notification.permission === 'granted';
+  
+  if (type === 'info' && canShowNotification) {
+    try {
+      new Notification('Sand Rover Update', {
+        body: message,
+        icon: 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png'
+      });
+    } catch (error) {
+      console.log('Desktop notifications not supported:', error);
+      // Continue with toast notification
+    }
   }
 
   // Create toast element
@@ -40,15 +49,27 @@ function showToast(message, type = 'info', duration = 5000) {
   return toast;
 }
 
-// Request notification permission when the page loads
+// Request notification permission
+function requestNotificationPermission() {
+  if (!('Notification' in window)) {
+    console.log('This browser does not support desktop notifications');
+    return;
+  }
+
+  if (Notification.permission !== 'denied' && window.isSecureContext) {
+    Notification.requestPermission().then(permission => {
+      console.log('Notification permission:', permission);
+    }).catch(error => {
+      console.log('Error requesting notification permission:', error);
+    });
+  }
+}
+
+// Initialize notification system
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    if (Notification.permission !== 'denied') {
-      Notification.requestPermission();
-    }
-  });
-} else if (Notification.permission !== 'denied') {
-  Notification.requestPermission();
+  document.addEventListener('DOMContentLoaded', requestNotificationPermission);
+} else {
+  requestNotificationPermission();
 }
 
 // Auto-logout configuration
@@ -118,15 +139,21 @@ function initializeApp() {
 
   // MANUAL button
   document.getElementById("manualBtn").addEventListener("click", () => {
-    db.ref("rover").set({
+    const manualData = {
       mode: "MANUAL",
       autoCommand: false,
-      status: "MANUAL MODE"
-    }).then(() => {
-      showToast('Manual mode activated', 'info');
-    }).catch((error) => {
-      showToast('Failed to activate manual mode: ' + error.message, 'error');
-    });
+      status: "MANUAL MODE",
+      timestamp: firebase.database.ServerValue.TIMESTAMP
+    };
+    
+    db.ref("rover").set(manualData)
+      .then(() => {
+        showToast('Manual mode activated', 'info');
+      })
+      .catch((error) => {
+        console.error('Manual mode activation error:', error);
+        showToast('Failed to activate manual mode. Please try again.', 'error');
+      });
   });
 
   // Track previous status
