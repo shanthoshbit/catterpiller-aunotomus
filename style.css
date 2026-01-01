@@ -17,6 +17,12 @@ body {
   justify-content: flex-start;
   padding-bottom: 30px;
 }
+.status {
+  font-weight: bold;
+  font-size: 18px;
+}
+.online { color: #00c853; }
+.offline { color: #d50000; }
 
 /* Button Styles */
 button {

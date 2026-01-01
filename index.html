@@ -1,31 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Sand Rover Control</title>
-  <link rel="icon" type="image/x-icon" href="https://static.vecteezy.com/system/resources/previews/027/949/944/non_2x/mfc-logo-design-inspiration-for-a-unique-identity-modern-elegance-and-creative-design-watermark-your-success-with-the-striking-this-logo-vector.jpg">
-  <link rel="stylesheet" href="style.css">
+
+  <link rel="icon" type="image/x-icon"
+    href="https://static.vecteezy.com/system/resources/previews/027/949/944/non_2x/mfc-logo-design-inspiration-for-a-unique-identity-modern-elegance-and-creative-design-watermark-your-success-with-the-striking-this-logo-vector.jpg">
+
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
   <div class="container">
+
     <button onclick="logout()" class="logout-btn" title="Logout"></button>
-    <h2>Autonomus Control</h2>
-    
+
+    <h2>Sand Rover Control</h2>
+
+    <!-- DEVICE STATUS -->
+    <div id="deviceStatus" class="status offline">
+      ● DEVICE OFFLINE
+    </div>
+
+    <!-- MODE CONTROL -->
     <div class="button-group">
       <button id="autoBtn">START AUTO MODE</button>
       <button id="manualBtn">MANUAL MODE</button>
     </div>
 
     <p>Status: <span id="status">---</span></p>
-    
-    <img id="rover-image" src="https://png.pngtree.com/png-vector/20230803/ourmid/pngtree-mars-rover-vector-png-image_6889496.png" alt="Sand Rover">
+
+    <!-- EMERGENCY STOP -->
+    <div class="emergency-box">
+      <button id="emergencyBtn" class="emergency-btn">
+        🛑 EMERGENCY STOP
+      </button>
+    </div>
+
+    <!-- MANUAL CONTROL -->
+    <div class="manual-control">
+      <h3>Manual Control</h3>
+
+      <button id="forwardBtn">⬆ Forward</button><br>
+
+      <button id="leftBtn">⬅ Left</button>
+      <button id="stopBtn">⏹ Stop</button>
+      <button id="rightBtn">➡ Right</button><br>
+
+      <button id="backBtn">⬇ Back</button>
+    </div>
+
+    <img id="rover-image"
+      src="https://png.pngtree.com/png-vector/20230803/ourmid/pngtree-mars-rover-vector-png-image_6889496.png"
+      alt="Sand Rover">
+
   </div>
 
-  <!-- Firebase -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
   <script src="app.js"></script>
 </body>
