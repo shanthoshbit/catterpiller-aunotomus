@@ -1,6 +1,7 @@
 /*************************************************
  * SAND ROVER CONTROL – app.js
  * Firebase v8 (STABLE)
+ * AUTO mode allowed ONLY when device is ONLINE
  *************************************************/
 
 /**************** FIREBASE CONFIG ****************/
@@ -17,7 +18,7 @@ const auth = firebase.auth();
 const db   = firebase.database();
 
 /**************** AUTO LOGOUT ****************/
-const INACTIVITY_TIMEOUT = 6 * 60 * 60 * 1000;
+const INACTIVITY_TIMEOUT = 6 * 60 * 60 * 1000; // 6 hours
 let logoutTimer;
 
 function startLogoutTimer() {
@@ -25,23 +26,24 @@ function startLogoutTimer() {
   logoutTimer = setTimeout(logout, INACTIVITY_TIMEOUT);
 }
 
-['mousedown','mousemove','keydown','scroll','touchstart']
+['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart']
   .forEach(evt => document.addEventListener(evt, startLogoutTimer));
 
 /**************** DEVICE ONLINE / OFFLINE ****************/
 const statusEl = document.getElementById("deviceStatus");
+
 let lastSeenTime = 0;      // milliseconds
 let deviceOnline = false;
 
-/* 🔴 FIX: convert seconds → milliseconds */
+/* 🔁 Heartbeat listener (ESP32 sends seconds) */
 db.ref("rover/device/lastSeen").on("value", snap => {
   const val = snap.val();
   if (typeof val === "number") {
-    lastSeenTime = val * 1000;   // 🔥 FIX HERE
+    lastSeenTime = val * 1000; // convert seconds → ms
   }
 });
 
-/* Check every 3 seconds */
+/* 🔄 Online status check every 3 seconds */
 setInterval(() => {
   const now = Date.now();
 
@@ -79,24 +81,34 @@ auth.onAuthStateChanged(user => {
 function initializeApp() {
   startLogoutTimer();
 
+  /* ---------- AUTO MODE ---------- */
   document.getElementById("autoBtn").onclick = () => {
+
+    // 🔒 SAFETY: allow AUTO only if device is ONLINE
+    if (!deviceOnline) {
+      alert("❌ Cannot start AUTO mode\nDevice is OFFLINE");
+      return;
+    }
+
     db.ref("rover").update({
       mode: "AUTO",
       emergencyStop: false,
       move: "STOP",
-      status: "AUTO MODE ACTIVE"
+      status: "AUTO MODE ACTIVATED"
     });
   };
 
+  /* ---------- MANUAL MODE ---------- */
   document.getElementById("manualBtn").onclick = () => {
     db.ref("rover").update({
       mode: "MANUAL",
       emergencyStop: false,
       move: "STOP",
-      status: "MANUAL MODE ACTIVE"
+      status: "MANUAL MODE ACTIVATED"
     });
   };
 
+  /* ---------- EMERGENCY STOP ---------- */
   document.getElementById("emergencyBtn").onclick = () => {
     db.ref("rover").update({
       mode: "MANUAL",
@@ -106,12 +118,14 @@ function initializeApp() {
     });
   };
 
+  /* ---------- MOVE BUTTONS ---------- */
   attachMoveButton("forwardBtn", "FORWARD");
   attachMoveButton("backBtn", "BACK");
   attachMoveButton("leftBtn", "LEFT");
   attachMoveButton("rightBtn", "RIGHT");
   attachMoveButton("stopBtn", "STOP");
 
+  /* ---------- STATUS DISPLAY ---------- */
   db.ref("rover/status").on("value", snap => {
     if (snap.exists()) {
       document.getElementById("status").innerText = snap.val();
@@ -125,6 +139,7 @@ function attachMoveButton(id, direction) {
   if (!btn) return;
 
   btn.onclick = () => {
+
     if (!deviceOnline) {
       alert("❌ Device OFFLINE");
       return;
