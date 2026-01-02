@@ -26,32 +26,26 @@ function startLogoutTimer() {
   logoutTimer = setTimeout(logout, INACTIVITY_TIMEOUT);
 }
 
-['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart']
+['mousedown','mousemove','keydown','scroll','touchstart']
   .forEach(evt => document.addEventListener(evt, startLogoutTimer));
 
 /**************** DEVICE ONLINE / OFFLINE ****************/
 const statusEl = document.getElementById("deviceStatus");
 
-let lastSeenTime = 0;      // milliseconds
+let lastSeenTime = 0;
 let deviceOnline = false;
 
-/* 🔁 Heartbeat listener (ESP32 sends seconds) */
+/* ESP32 sends seconds */
 db.ref("rover/device/lastSeen").on("value", snap => {
-  const val = snap.val();
-  if (typeof val === "number") {
-    lastSeenTime = val * 1000; // convert seconds → ms
+  if (typeof snap.val() === "number") {
+    lastSeenTime = snap.val() * 1000;
   }
 });
 
-/* 🔄 Online status check every 3 seconds */
 setInterval(() => {
   const now = Date.now();
-
-  if (lastSeenTime && (now - lastSeenTime < 15000)) {
-    setOnline();
-  } else {
-    setOffline();
-  }
+  if (lastSeenTime && now - lastSeenTime < 15000) setOnline();
+  else setOffline();
 }, 3000);
 
 function setOnline() {
@@ -70,11 +64,8 @@ function setOffline() {
 
 /**************** AUTH CHECK ****************/
 auth.onAuthStateChanged(user => {
-  if (!user) {
-    window.location.href = "login.html";
-  } else {
-    initializeApp();
-  }
+  if (!user) window.location.href = "login.html";
+  else initializeApp();
 });
 
 /**************** INITIALIZE APP ****************/
@@ -84,17 +75,16 @@ function initializeApp() {
   /* ---------- AUTO MODE ---------- */
   document.getElementById("autoBtn").onclick = () => {
 
-    // 🔒 SAFETY: allow AUTO only if device is ONLINE
     if (!deviceOnline) {
-      alert("❌ Cannot start AUTO mode\nDevice is OFFLINE");
+      alert("❌ Cannot start AUTO\nDevice is OFFLINE");
       return;
     }
 
     db.ref("rover").update({
       mode: "AUTO",
       emergencyStop: false,
-      move: "STOP",
-      status: "AUTO MODE ACTIVATED"
+      move: "STOP"
+      // ⚠️ status left for ESP32 to control
     });
   };
 
@@ -104,17 +94,16 @@ function initializeApp() {
       mode: "MANUAL",
       emergencyStop: false,
       move: "STOP",
-      status: "MANUAL MODE ACTIVATED"
+      status: "MANUAL MODE"
     });
   };
 
   /* ---------- EMERGENCY STOP ---------- */
   document.getElementById("emergencyBtn").onclick = () => {
     db.ref("rover").update({
-      mode: "MANUAL",
       emergencyStop: true,
       move: "STOP",
-      status: "🚨 EMERGENCY STOP ACTIVATED"
+      status: "🚨 EMERGENCY STOP"
     });
   };
 
@@ -127,9 +116,14 @@ function initializeApp() {
 
   /* ---------- STATUS DISPLAY ---------- */
   db.ref("rover/status").on("value", snap => {
-    if (snap.exists()) {
+    if (snap.exists())
       document.getElementById("status").innerText = snap.val();
-    }
+  });
+
+  /* ---------- MODE LISTENER (UI LOCK) ---------- */
+  db.ref("rover/mode").on("value", snap => {
+    const mode = snap.val();
+    toggleManualControls(mode === "MANUAL");
   });
 }
 
@@ -165,6 +159,15 @@ function attachMoveButton(id, direction) {
       });
     });
   };
+}
+
+/**************** UI CONTROL ****************/
+function toggleManualControls(enable) {
+  const ids = ["forwardBtn","backBtn","leftBtn","rightBtn","stopBtn"];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = !enable;
+  });
 }
 
 /**************** LOGOUT ****************/
